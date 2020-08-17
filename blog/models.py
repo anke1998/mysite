@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
-from ckeditor.fields import RichTextField
 from django.db import models
 from mdeditor.fields import MDTextField
+from read.models import ReadNumExpandMethod
+from django.db.models.fields import exceptions
 # Create your models here.
 
 
@@ -12,7 +12,8 @@ class BlogType(models.Model):
 	def __str__(self):
 		return self.type_name
 
-class Blog(models.Model):
+
+class Blog(models.Model, ReadNumExpandMethod):
 	title = models.CharField(max_length=50)
 	blog_type = models.ForeignKey(BlogType,on_delete=models.DO_NOTHING)
 	content = MDTextField()
@@ -20,9 +21,9 @@ class Blog(models.Model):
 	created_time = models.DateTimeField(auto_now_add=True)
 	last_update_time = models.DateTimeField(auto_now=True)
 
+
 	def	__str__(self):
 		return "<Blog:%s>" %self.title
 
 	class Meta:
 		ordering = ['-created_time']
-

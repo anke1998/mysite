@@ -1,7 +1,10 @@
-from django.shortcuts import render_to_response,get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404
 from django.core.paginator import Paginator
-from .models import Blog,BlogType
+from .models import Blog, BlogType
 import markdown
+from datetime import datetime
+from read.models import Readnum
+from read.utils import read_statistics_once_read
 # Create your views here.
 each_page_blog_number = 5
 
@@ -65,11 +68,16 @@ def blogs_with_date(request, year, month):
 
 
 def blog_detail(request, blog_pk):
-    context={}
     blog = get_object_or_404(Blog, pk=blog_pk)
+    read_cookie_key = read_statistics_once_read(request, blog)
+
+    context={}
     blog.content = markdown.markdown(blog.content, extensions=[
         'markdown.extensions.extra', 'markdown.extensions.codehilite', 'markdown.extensions.toc', ])
     context['previous_blog'] = Blog.objects.filter(created_time__gt=blog.created_time).last()
     context['next_blog'] = Blog.objects.filter(created_time__lt=blog.created_time).first()
     context['blog'] = blog
-    return render_to_response('blog/blog_detail.html', context)
+    response = render_to_response('blog/blog_detail.html', context) # 响应
+    response.set_cookie(read_cookie_key, 'true', max_age=60, expires=datetime)
+    return response
+
