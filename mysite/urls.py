@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('blog/',include(blog_urls)),
     path(r'mdeditor/', include('mdeditor.urls')),
+    path('comment/', include('comment.urls')),
+    path('user/',include('user.urls')),
 ]
 
 if settings.DEBUG:
